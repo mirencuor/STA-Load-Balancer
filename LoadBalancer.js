@@ -13,6 +13,8 @@ export default class LoadBalancer {
     // }
     // Los datos son de solo lectura y se actualizan durante la simulación.
     this.servers = Object.freeze([...servers]);
+    this.turno = 0;
+    
   }
 
   async onRequestArrival(request, sendToServer) {
@@ -22,7 +24,14 @@ export default class LoadBalancer {
     //   payload: "08319462", // Datos que envía el cliente
     //   work: 4              // Unidades de trabajo necesarias
     // }
-    const server = this.servers[0];
+let total = this.servers.length;
+
+    if (this.turno >= total){
+      this.turno = 0;
+    }
+  
+    const server = this.servers[this.turno];
+    this.turno = this.turno + 1 ; 
 
     // Envía la petición al servidor y devuelve su respuesta al cliente.
     return sendToServer(server.id);
