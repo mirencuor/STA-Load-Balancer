@@ -15,8 +15,6 @@ export default class LoadBalancer {
     this.servers = servers;
     this.siguiente = 0;
     this.acumulado = 0;
-   
-    
   }
 
   async onRequestArrival(request, sendToServer) {
@@ -26,23 +24,23 @@ export default class LoadBalancer {
     //   payload: "08319462", // Datos que envía el cliente
     //   work: 4              // Unidades de trabajo necesarias
     // }
-  let total = this.servers.length;
-  
-  if (this.siguiente >= total){
-    this.siguiente = 0;
-     }
+    let conexiones  = [];
+    for (const i in this.servers) {
+      conexiones = conexiones + this.servers[i].queuedRequests.length;
+        } 
 
-  let acumulado = 0;
-  
+    let minimo = Infinity;
+    this.siguiente  = 0;
+
+    for (const j in conexiones) {
+      if (minimo > conexiones[j]) {
+        minimo = conexiones[j];
+        this.siguiente = j;
+      }
+    }
+    
+
   const server = this.servers[this.siguiente];
-  if (this.acumulado < server.power - 1){
-    this.acumulado = this.acumulado + 1;
-  } else {
-    this.siguiente = this.siguiente + 1;
-    this.acumulado = 0;
-  
-  }
-
 
     // Envía la petición al servidor y devuelve su respuesta al cliente.
     return sendToServer(server.id);
